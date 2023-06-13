@@ -1,18 +1,57 @@
-// let input =document.querySelector(`.list`)
-// let addBtn =document.querySelector(`.add-list`)
-// let tasks =document.querySelector(`.tasks`)
-// //add btn disabled
-// input.addEventListener("keyup"()=>{
-//     if(input.value.trim() i==0){
-//         addBtn.classlist.add('active')
-//     }else{
-//         addBtn.classlist.remove('active')  
-//     }
-// })
-// addBtn.addEventListener('click')
+
 const addListButton = document.querySelector('.add-list');
 const inputField = document.querySelector('.list');
 const tasksContainer = document.querySelector('.tasks');
+
+// Function to create a new task item
+function createTaskItem(taskText) {
+  const taskItem = document.createElement('div');
+  taskItem.classList.add('items');
+  
+  const taskParagraph = document.createElement('p');
+  taskParagraph.textContent = taskText;
+  
+  const taskButtons = document.createElement('div');
+  taskButtons.classList.add('items-btn');
+  
+  const editIcon = document.createElement('i');
+  editIcon.classList.add('fas', 'fa-pen');
+  editIcon.addEventListener('click', () => {
+    // Replace task paragraph with editable input field
+    const editInput = document.createElement('input');
+    editInput.type = 'text';
+    editInput.value = taskParagraph.textContent;
+    editInput.classList.add('edit-input');
+    
+    editInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        // Save the edited task
+        taskParagraph.textContent = editInput.value;
+        taskItem.removeChild(editInput);
+      }
+    });
+    
+    taskItem.replaceChild(editInput, taskParagraph);
+    editInput.focus();
+  });
+  
+  const deleteIcon = document.createElement('i');
+  deleteIcon.classList.add('fas', 'fa-trash');
+  deleteIcon.addEventListener('click', () => {
+    // Implement the delete functionality here
+    console.log('Delete task:', taskText);
+    tasksContainer.removeChild(taskItem);
+  });
+  
+  // Append elements to the task item
+  taskButtons.appendChild(editIcon);
+  taskButtons.appendChild(deleteIcon);
+  
+  taskItem.appendChild(taskParagraph);
+  taskItem.appendChild(taskButtons);
+  
+  return taskItem;
+}
 
 //Add event listener to the Add button
 addListButton.addEventListener('click', () => {
@@ -20,35 +59,7 @@ addListButton.addEventListener('click', () => {
   
   if (taskText !== '') {
     // Create a new task item
-    const taskItem = document.createElement('div');
-    taskItem.classList.add('items');
-    
-    const taskParagraph = document.createElement('p');
-    taskParagraph.textContent = taskText;
-    
-    const taskButtons = document.createElement('div');
-    taskButtons.classList.add('items-btn');
-    
-    const editIcon = document.createElement('i');
-    editIcon.classList.add('fa-sharp', 'fa-solid', 'fa-pen-to-square');
-    editIcon.addEventListener('click', () => {
-      // Implement the edit functionality here
-      console.log('Edit task:', taskText);
-    });
-    
-    const deleteIcon = document.createElement('i');
-    deleteIcon.classList.add('fa-solid', 'fa-xmark');
-    deleteIcon.addEventListener('click', () => {
-      // Implement the delete functionality here
-      console.log('Delete task:', taskText);
-    });
-    
-    // Append elements to the task item
-    taskButtons.appendChild(editIcon);
-    taskButtons.appendChild(deleteIcon);
-    
-    taskItem.appendChild(taskParagraph);
-    taskItem.appendChild(taskButtons);
+    const taskItem = createTaskItem(taskText);
     
     // Append the task item to the tasks container
     tasksContainer.appendChild(taskItem);
@@ -58,46 +69,62 @@ addListButton.addEventListener('click', () => {
   }
 });
 
-
 //
-// addListButton.addEventListener('click', () => {
-//   // ...
+document.getElementById('add-user').addEventListener('submit',async function(event){
+  event.preventDefault();
+  // let forData =new FormData(this);
+  // console.log({FormData});
+  let firstName=document.getElementById('first-name').value;
+  let lastName=document.getElementById('last-name').value;
+  let age=document.getElementById('age').value;
 
-//   // Create a new task item
-//   const taskItem = document.createElement('div');
-//   taskItem.classList.add('items');
+  let data={
+      firstName:firstName,
+      lastName:lastName,
+      age:age,
+  }
+  console.log({data});
+let result= await fetch('https://dummyjson.com/users/add',{
+  method:'POST',
+  headers:{
+      'content-Type':'application/json'
+  },
+  body:JSON.stringify(data)
+  
 
-//   // ...
+})
+.then(response=>response.json())
+.then(response=>response)
+.catch(error=>error.message)
 
-//   // Add event listener to mark a task as completed
-//   taskParagraph.addEventListener('click', () => {
-//     taskItem.classList.toggle('completed');
-//   });
 
-//   // ...
-// });
+console.log({result});
+let success=document.getElementById('success');
+result.id? success.innerHTML='user added successfully':success.innerHTMLHTML='user not added';
 
-// addListButton.addEventListener('click', () => {
-//   // ...
+})
+const userId = 1;
 
-//   if (taskText !== '') {
-//     // Create a new task item
-//     const taskItem = document.createElement('div');
-//     taskItem.classList.add('items');
+fetch('https://dummyjson.com/todos')
+  .then(response => response.json())
+  .then(data => {
+    // Filter todos based on user ID
+    const filteredTodos = data.filter(todo => todo.userId === userId);
 
-//     // ...
+    // Display todos in the browser
+    const todoList = document.querySelector('.todo-list');
 
-//     // Set data attribute for user ID
-//     taskItem.setAttribute('data-user-id', userID);
+    filteredTodos.forEach(todo => {
+      const todoItem = document.createElement('div');
+      todoItem.classList.add('todo-item');
 
-//     // ...
+      const todoTitle = document.createElement('h3');
+      todoTitle.textContent = todo.title;
 
-//     // Clear the input field
-//     inputField.value = '';
-//   }
-// });
+      todoItem.appendChild(todoTitle);
+      todoList.appendChild(todoItem);
+    });
+  })
+  .catch(error => console.error('Error fetching todos:', error));
 
-// deleteIcon.addEventListener('click', () => {
-//   // Remove the task item from the tasks container
-//   taskItem.remove();
-// });
+
